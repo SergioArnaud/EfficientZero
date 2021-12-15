@@ -413,6 +413,11 @@ def _train(model, target_model, replay_buffer, shared_storage, batch_storage, co
 
         step_count += 1
 
+        print('='*20)
+        print('EZ')
+        print(step_count)
+        print('='*20)
+
         # save models
         if step_count % config.save_ckpt_interval == 0:
             model_path = os.path.join(config.model_dir, 'model_{}.p'.format(step_count))
