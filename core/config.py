@@ -369,8 +369,9 @@ class BaseConfig(object):
                 hparams[k] = v
         return hparams
 
-    def set_config(self, args):
+    def set_config(self, args, experiment_id):
         # reset config from the args
+        self.experiment_id = experiment_id
         self.set_game(args.env)
         self.case = args.case
         self.seed = args.seed

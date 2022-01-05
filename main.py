@@ -6,6 +6,7 @@ import numpy as np
 import ray
 import torch
 from torch.utils.tensorboard import SummaryWriter
+import uuid
 
 from core.test import test
 from core.train import train
@@ -78,7 +79,8 @@ if __name__ == '__main__':
         raise Exception('Invalid --case option')
 
     # set config as per arguments
-    exp_path = game_config.set_config(args)
+    experiment_id = uuid.uuid1()
+    exp_path = game_config.set_config(args, experiment_id)
     exp_path, log_base_path = make_results_dir(exp_path, args)
 
     # set-up logger

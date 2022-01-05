@@ -260,6 +260,7 @@ class DynamicsNetwork(nn.Module):
         x = self.bn_reward(x)
         x = nn.functional.relu(x)
 
+        print(self.block_output_size_reward)
         x = x.view(-1, self.block_output_size_reward).unsqueeze(0)
         value_prefix, reward_hidden = self.lstm(x, reward_hidden)
         value_prefix = value_prefix.squeeze(0)

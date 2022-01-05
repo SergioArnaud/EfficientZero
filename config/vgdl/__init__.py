@@ -18,11 +18,11 @@ from DopamineVGDLEnv import DopamineVGDLEnv
 class VGDLConfig(BaseConfig):
     def __init__(self):
         super(VGDLConfig, self).__init__(
-            training_steps=100000,
+            training_steps=250_000,
             last_steps=20000,
             test_interval=10000,
-            log_interval=1000,
-            vis_interval=1000,
+            log_interval=10,
+            vis_interval=10,
             test_episodes=32,
             checkpoint_interval=100,
             target_model_interval=200,
@@ -55,8 +55,8 @@ class VGDLConfig(BaseConfig):
             total_transitions=100 * 1000,
             transition_num=1,
             # frame skip & stack observation
-            frame_skip=1,
-            stacked_observations=1,
+            frame_skip=4,
+            stacked_observations=4,
             # coefficient
             reward_loss_coeff=1,
             value_loss_coeff=0.25,
@@ -139,7 +139,7 @@ class VGDLConfig(BaseConfig):
             state_norm=self.state_norm)
 
     def new_game(self, seed=None, save_video=False, save_path=None, video_callable=None, uid=None, test=False, final_test=False):
-        env = DopamineVGDLEnv(self.env_name, 'EfficientZero')
+        env = DopamineVGDLEnv(self.env_name, 'EfficientZero', uuid = self.experiment_id)
         return VGDLWrapper(env, discount=self.discount, cvt_string=self.cvt_string)
 
     def scalar_reward_loss(self, prediction, target):
