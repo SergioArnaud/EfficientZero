@@ -1,6 +1,7 @@
 import ray
 import time
 import torch
+import logging
 
 import numpy as np
 import core.ctree.cytree as cytree
@@ -12,7 +13,7 @@ from core.game import GameHistory
 from core.utils import select_action, prepare_observation_lst
 
 
-@ray.remote(num_gpus=0.125)
+@ray.remote(num_gpus=0.25)
 class DataWorker(object):
     def __init__(self, rank, replay_buffer, storage, config):
         """Data Worker for collecting data through self-play
@@ -109,7 +110,7 @@ class DataWorker(object):
         model.eval()
 
         start_training = False
-        envs = [self.config.new_game(self.config.seed + self.rank * i, train_env=True) for i in range(env_nums)]
+        envs = [self.config.new_game(self.config.seed + self.rank * i) for i in range(env_nums)]
 
         def _get_max_entropy(action_space):
             p = 1.0 / action_space
@@ -217,6 +218,10 @@ class DataWorker(object):
                             self_play_rewards_max = - np.inf
 
                     step_counter += 1
+                    logging.getLogger('train').info("Perro del mal")
+                    if step_counter % 100 == 0:
+                        print("step_counter: {}".format(step_counter))
+                        logging.getLogger('train').info("step_counter: {}".format(step_counter))
                     for i in range(env_nums):
                         # reset env if finished
                         if dones[i]:
@@ -314,6 +319,9 @@ class DataWorker(object):
 
                         eps_steps_lst[i] += 1
                         total_transitions += 1
+                        if total_transitions % 100 == 0:
+                            print("Transitions collected: {}".format(total_transitions))
+                            logging.getLogger('train').info("Transitions collected: {}".format(total_transitions))
 
                         if self.config.use_priority and not self.config.use_max_priority and start_training:
                             pred_values_lst[i].append(network_output.value[i].item())
