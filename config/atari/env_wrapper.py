@@ -1,10 +1,20 @@
+import csv
+import uuid
+import time
 import numpy as np
 from core.game import Game
 from core.utils import arr_to_str
 
 
 class AtariWrapper(Game):
-    def __init__(self, env, discount: float, cvt_string=True):
+    def __init__(
+        self,
+        env,
+        discount: float,
+        cvt_string=True,
+        train_env=False,
+        game_name=self.env_name,
+    ):
         """Atari Wrapper
         Parameters
         ----------
@@ -16,17 +26,53 @@ class AtariWrapper(Game):
             True -> convert the observation into string in the replay buffer
         """
         super().__init__(env, env.action_space.n, discount)
+
+        date = time.strftime("%Y.%m.%d")
+        self.experiment_uuid = uuid.uuid1()
+        self.game_name = game_name
+        experiment_id = "{}_{}".format(time.strftime("%Y.%m.%d_%H.%M.%S_%f"), game_name)
+
+        self.steps = 0
+        self.experiment_outpath = "../../../experiments/{}/{}/{}/{}/{}".format(
+            "EfficientZero", game_name, date, self.experiment_uuid, experiment_id
+        )
         self.cvt_string = cvt_string
+
+        with open(
+            "{}/{}_{}_reward_history.csv".format(
+                self.experiment_outpath,
+                self.experiment_uuid,
+                self.game_name
+            ),
+            "w",
+        ) as file:
+            writer = csv.writer(file)
+            writer.writerow(
+                ["steps", "reward", "done"]
+            )
 
     def legal_actions(self):
         return [_ for _ in range(self.env.action_space.n)]
 
     def step(self, action):
+
+        self.steps += 1
         observation, reward, done, info = self.env.step(action)
         observation = observation.astype(np.uint8)
 
         if self.cvt_string:
             observation = arr_to_str(observation)
+
+        with open(
+            "{}/{}_{}_reward_history.csv".format(
+                self.experiment_outpath,
+                self.experiment_uuid,
+                self.game_name
+            ),
+            "w",
+        ) as file:
+            writer = csv.writer(file)
+            writer.writerow([self.steps, reward, done])
 
         return observation, reward, done, info
 

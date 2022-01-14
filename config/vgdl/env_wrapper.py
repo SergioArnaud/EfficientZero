@@ -4,7 +4,7 @@ from core.utils import arr_to_str
 
 
 class VGDLWrapper(Game):
-    def __init__(self, env, discount: float, cvt_string=True):
+    def __init__(self, env, discount: float, cvt_string=True, train_env=False):
         """Atari Wrapper
         Parameters
         ----------

@@ -130,7 +130,7 @@ class AtariConfig(BaseConfig):
             init_zero=self.init_zero,
             state_norm=self.state_norm)
 
-    def new_game(self, seed=None, save_video=False, save_path=None, video_callable=None, uid=None, test=False, final_test=False):
+    def new_game(self, seed=None, save_video=False, save_path=None, video_callable=None, uid=None, test=False, final_test=False, train_env=False):
         if test:
             if final_test:
                 max_moves = 108000 // self.frame_skip
@@ -150,7 +150,7 @@ class AtariConfig(BaseConfig):
         if save_video:
             from gym.wrappers import Monitor
             env = Monitor(env, directory=save_path, force=True, video_callable=video_callable, uid=uid)
-        return AtariWrapper(env, discount=self.discount, cvt_string=self.cvt_string)
+        return AtariWrapper(env, discount=self.discount, cvt_string=self.cvt_string, train_env=train_env, game_name=self.env_name)
 
     def scalar_reward_loss(self, prediction, target):
         return -(torch.log_softmax(prediction, dim=1) * target).sum(1)
