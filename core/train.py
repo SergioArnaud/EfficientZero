@@ -1,3 +1,4 @@
+import logging
 import os
 import ray
 import time
@@ -361,7 +362,7 @@ def _train(model, target_model, replay_buffer, shared_storage, batch_storage, co
     while not (ray.get(replay_buffer.get_total_len.remote()) >= config.start_transitions):
         time.sleep(1)
         pass
-    print('Begin training...')
+    logging.getLogger('train').info('Begin training')
     # set signals for other workers
     shared_storage.set_start_signal.remote()
 
@@ -413,10 +414,10 @@ def _train(model, target_model, replay_buffer, shared_storage, batch_storage, co
 
         step_count += 1
 
-        print('='*20)
-        print('EZ')
-        print(step_count)
-        print('='*20)
+        logging.getLogger('train').info('='*20)
+        logging.getLogger('train').info('EZ')
+        logging.getLogger('train').info(step_count)
+        logging.getLogger('train').info('='*20)
 
         # save models
         if step_count % config.save_ckpt_interval == 0:

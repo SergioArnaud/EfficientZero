@@ -61,11 +61,14 @@ if __name__ == '__main__':
     assert args.revisit_policy_search_rate is None or 0 <= args.revisit_policy_search_rate <= 1, \
         ' Revisit policy search rate should be in [0,1]'
 
+    print('Trying to start up ray...')
     if args.opr == 'train':
         ray.init(num_gpus=args.num_gpus, num_cpus=args.num_cpus,
-                 object_store_memory=args.object_store_memory)
+                 object_store_memory=args.object_store_memory,
+                 ignore_reinit_error=True , include_dashboard=False)
     else:
         ray.init()
+    print('Ray started!')
 
     # seeding random iterators
     set_seed(args.seed)

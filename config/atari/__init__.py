@@ -1,4 +1,5 @@
 import torch
+import random
 
 from core.config import BaseConfig
 from core.utils import make_atari, WarpFrame, EpisodicLifeEnv
@@ -12,13 +13,13 @@ class AtariConfig(BaseConfig):
         super(AtariConfig, self).__init__(
             training_steps=100000,
             last_steps=20000,
-            test_interval=10000,
+            test_interval=1000,
             log_interval=1000,
             vis_interval=1000,
-            test_episodes=32,
-            checkpoint_interval=100,
+            test_episodes=4,
+            checkpoint_interval=1000,
             target_model_interval=200,
-            save_ckpt_interval=10000,
+            save_ckpt_interval=1000,
             max_moves=108000,
             test_max_moves=12000,
             history_length=400,
@@ -150,7 +151,16 @@ class AtariConfig(BaseConfig):
         if save_video:
             from gym.wrappers import Monitor
             env = Monitor(env, directory=save_path, force=True, video_callable=video_callable, uid=uid)
-        return AtariWrapper(env, discount=self.discount, cvt_string=self.cvt_string, train_env=train_env, game_name=self.env_name)
+
+        return AtariWrapper(
+            env,
+            discount=self.discount,
+            cvt_string=self.cvt_string,
+            train_env=train_env,
+            test_env=test,
+            test_name=random.randint(0, 1000000),
+            game_name=self.env_name
+        )
 
     def scalar_reward_loss(self, prediction, target):
         return -(torch.log_softmax(prediction, dim=1) * target).sum(1)
