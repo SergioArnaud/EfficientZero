@@ -94,6 +94,10 @@ class AtariWrapper(Game):
         observation, reward, done, info = self.env.step(action)
         observation = observation.astype(np.uint8)
 
+        # Count real number of frames processed.
+        real_frame_count = self.steps * 4
+        info["real_frame_count"] = real_frame_count
+
         if self.cvt_string:
             observation = arr_to_str(observation)
 
@@ -124,7 +128,6 @@ class AtariWrapper(Game):
 
         if self.test_env:
             self.history = [self.steps, reward, done, info]
-            
             write_step_to_csv(
                 self.experiment_outpath,
                 "{}_{}_test_reward_history.csv".format(
